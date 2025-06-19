@@ -1,0 +1,18 @@
+fastapi
+streamlit
+scikit-learn
+pandas
+matplotlib
+seaborn
+plotly
+imblearn
+uvicorn
+boto3    # aws
+ipykernel
+
+
+pymongo[srv]==3.6
+
+
+setuptools
+-e .  #  This installs your project in "editable mode", meaning any changes you make in your code are reflected immediately without needing to reinstall.
