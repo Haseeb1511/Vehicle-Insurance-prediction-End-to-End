@@ -30,3 +30,5 @@ def configure_logger(name):
     logger.addHandler(consol_handler)
 
     return logger
+
+
