@@ -9,9 +9,10 @@ imblearn
 uvicorn
 boto3    # aws
 ipykernel
+logging 
 
-
-pymongo[srv]==3.6
+from_root   # make dir in root of project
+pymongo   # mongodb
 
 
 setuptools
