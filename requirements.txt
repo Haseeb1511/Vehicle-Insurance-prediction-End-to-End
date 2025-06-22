@@ -10,7 +10,7 @@ uvicorn
 boto3    # aws
 ipykernel
 logging 
-
+pickle
 from_root   # make dir in root of project
 pymongo   # mongodb
 
