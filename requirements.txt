@@ -16,4 +16,4 @@ pymongo   # mongodb
 
 
 setuptools
--e .  #  This installs your project in "editable mode", meaning any changes you make in your code are reflected immediately without needing to reinstall.
+-e .  #  This installs your project in "editable mode", meaning any changes you make in your code are reflected immediately without needing to reinstall
