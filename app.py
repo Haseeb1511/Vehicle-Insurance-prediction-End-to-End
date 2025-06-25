@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import pickle
 
-with open("model/model.pkl","rb") as f:
+with open("model/pipe.pkl","rb") as f:
     model = pickle.load(f)
 
 
@@ -39,13 +39,6 @@ user_input = pd.DataFrame([{
     "vintage": 150
 }])
     
-def preprocessing_function(data:pd.DataFrame)->pd.DataFrame:
-    data["gender"] = data["gender"].map({"Male": 0, "Female": 1})
-    data["vehicle_damage"] = data["vehicle_damage"].astype("int")
-    return data
-    
 if submitted:
-    preprocessing_function(user_input)
-
-
-# st.success(f"Prediction: {'Interested in Insurance' if prediction == 1 else 'Not Interested'}")
+    prediction = model.predict(user_input)[0]
+    st.success(f"Prediction: {'Interested in Insurance' if prediction == 1 else 'Not Interested'}")
