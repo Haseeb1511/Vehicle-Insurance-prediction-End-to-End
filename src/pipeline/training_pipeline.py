@@ -32,7 +32,7 @@ class TrainPipeline:
         self.data_ingestion_config = DataIngestionConfig()
         self.data_validation_config = DataValidationConfig()
         self.data_transformation_config = DataTransformationConfig()
-        # self.model_trainer_config = ModelTrainerConfig()
+        self.model_trainer_config = ModelTrainerConfig()
         # self.model_evaluation_config = ModelEvaluationConfig()
         # self.model_pusher_config = ModelPusherConfig()
 
@@ -119,8 +119,8 @@ class TrainPipeline:
     # def start_model_evaluation(self, data_ingestion_artifact: DataIngestionArtifact,
     #                            model_trainer_artifact: ModelTrainerArtifact) -> ModelEvaluationArtifact:
     #     """
-        logger.info("-----------------------ModelEvaluation----------------------------------------")
-        logger.info("Entered the start_model_evaluation method of TrainPipeline class")
+    #    logger.info("-----------------------ModelEvaluation----------------------------------------")
+    #    logger.info("Entered the start_model_evaluation method of TrainPipeline class")
     #     This method of TrainPipeline class is responsible for starting modle evaluation
     #     """
     #     try:
@@ -140,8 +140,8 @@ class TrainPipeline:
     #     """
     #     This method of TrainPipeline class is responsible for starting model pushing
     #     """
-        logger.info("-----------------------ModelPusher----------------------------------------")
-        logger.info("Entered the start_model_pusher method of TrainPipeline class")
+    #    logger.info("-----------------------ModelPusher----------------------------------------")
+    #    logger.info("Entered the start_model_pusher method of TrainPipeline class")
     #     try:
     #         model_pusher = ModelPusher(model_evaluation_artifact=model_evaluation_artifact,
     #                                    model_pusher_config=self.model_pusher_config
@@ -154,7 +154,7 @@ class TrainPipeline:
 
 #-----------------------------------------------------------Pipeline----------------------------------------------------------------------
 
-    def run_pipeline(self, ) -> None:
+    def run_pipeline(self ) -> None:
         """
         This method of TrainPipeline class is responsible for running complete pipeline
         """

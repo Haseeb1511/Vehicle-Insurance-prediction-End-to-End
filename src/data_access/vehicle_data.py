@@ -8,6 +8,8 @@ from typing import Optional
 from src.configuration.mongodb import MongoDBClient
 from src.constant import DATABASE_NAME
 from src.exception import MyException
+from src.logger import configure_logger
+logger = configure_logger("mongo_to_pd")
 
 
 class VehicleData():
@@ -32,8 +34,10 @@ class VehicleData():
             # Convert collection data to DataFrame and preprocess
             print("Fetching data from mongoDB")
 
-            df = pd.DataFrame(list(collection.find()))    ## This returns a list of documents (dicts)
+            df = pd.DataFrame(list(collection.find().limit(2000)))    ## This returns a list of documents (dicts)
+
             print(f"Data fecthed with len: {len(df)}")
+            logger.info(f"Data fetched from Mongodb with len: {len(df)}")
 
             if "id" in df.columns.to_list():
                 df = df.drop(columns=["id"], axis=1)

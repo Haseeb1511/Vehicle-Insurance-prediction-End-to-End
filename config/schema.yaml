@@ -21,7 +21,6 @@ numerical_columns:
   - Annual_Premium
   - Policy_Sales_Channel
   - Vintage
-  - Response
 
 categorical_columns:
   - Gender

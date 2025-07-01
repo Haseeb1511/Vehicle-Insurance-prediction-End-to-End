@@ -39,10 +39,10 @@ class DataTransformation:
         num_feature = self._schema_config["numerical_columns"]
         mm_column = self._schema_config["mm_columns"]
 
-        preprocess = ColumnTransformer(transformers=[(
+        preprocess = ColumnTransformer(transformers=[
             ("Standard Scaled",sc,num_feature),
             ("MinMax Scaler",min_max_scaler,mm_column)
-        )],remainder="passthrough")
+        ],remainder="passthrough")
 
         final_pipeline = Pipeline(steps=[
             ("preprocess",preprocess)
@@ -92,30 +92,34 @@ class DataTransformation:
             #loading train and test data
             train_df = DataTransformation.read_data(file_path=self.data_ingestion_artifact.trained_file_path)
             test_df = DataTransformation.read_data(file_path=self.data_ingestion_artifact.test_file_path)
+            logger.info("train and test data loaded")
 
             #splitting in to x and y
             input_feature_train_df = train_df.drop(columns=[TARGET_COLUMN],axis=1)
             target_feature_train_df = train_df[TARGET_COLUMN] 
             input_feature_test_df = test_df.drop(columns=[TARGET_COLUMN],axis=1)
             target_feature_test_df = test_df[TARGET_COLUMN] 
+            logger.info("x and y selected for transformation")
 
             #Transformation on training data
             input_feature_train_df = self._map_gender_column(input_feature_train_df)
             input_feature_train_df = self._drop_id_column(input_feature_train_df)        
             input_feature_train_df = self._create_dummy_columns(input_feature_train_df)
-            input_feature_train_df = self._create_dummy_columns(input_feature_train_df)
+            input_feature_train_df = self._rename_columns(input_feature_train_df)
+            logger.info("Custom transformations applied to train data")
 
             #Transformation on test data
             input_feature_test_df = self._map_gender_column(input_feature_test_df)
             input_feature_test_df = self._drop_id_column(input_feature_test_df)        
             input_feature_test_df = self._create_dummy_columns(input_feature_test_df)
-            input_feature_test_df = self._create_dummy_columns(input_feature_test_df)
+            input_feature_test_df = self._rename_columns(input_feature_test_df)
+            logger.info("Custom transformations applied to test data")
 
             preprocess = self.get_data_transformer_obj()
 
-            input_feature_train_arr = preprocess.fit(input_feature_train_df)
-            input_feature_test_arr = preprocess.fit(input_feature_test_df)
-
+            input_feature_train_arr = preprocess.fit_transform(input_feature_train_df)
+            input_feature_test_arr = preprocess.transform(input_feature_test_df)
+            logger.info("Applying SMOTEENIN")
             smt = SMOTEENN(sampling_strategy="minority")
             input_feature_train_final, target_feature_train_final = smt.fit_resample(
                     input_feature_train_arr, target_feature_train_df

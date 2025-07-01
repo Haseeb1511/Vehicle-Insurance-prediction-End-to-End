@@ -23,12 +23,12 @@ class ModelTrainer:
     def get_model_obj_and_report(self,train:np.ndarray,test:np.ndarray):
         try:
             x_train,y_train,x_test,y_test = train[:,:-1],train[:,-1],test[:,:-1],test[:,-1]
-            model = RandomForestClassifier(self.model_trainer_config._n_estimators,
-                                        self.model_trainer_config._max_depth,
-                                        self.model_trainer_config._min_samples_leaf,
-                                        self.model_trainer_config._min_samples_split,
-                                        self.model_trainer_config._criterion,
-                                        self.model_trainer_config._random_state
+            model = RandomForestClassifier(n_estimators=self.model_trainer_config._n_estimators,
+                                        max_depth=self.model_trainer_config._max_depth,
+                                        min_samples_leaf=self.model_trainer_config._min_samples_leaf,
+                                        min_samples_split=self.model_trainer_config._min_samples_split,
+                                        criterion=self.model_trainer_config._criterion,
+                                        random_state=self.model_trainer_config._random_state
                                         )
             model.fit(x_train,y_train)
 
@@ -51,8 +51,8 @@ class ModelTrainer:
     
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         try:
-            train_array = load_numpy_array_data(file_path=self.data_transformation_artifact.trained_file_path)
-            test_array = load_numpy_array_data(file_path=self.data_transformation_artifact.test_file_path)
+            train_array = load_numpy_array_data(file_path=self.data_transformation_artifact.transformed_train_file_path)
+            test_array = load_numpy_array_data(file_path=self.data_transformation_artifact.transformed_test_file_path)
 
             trained_model,metric_artifact = self.get_model_obj_and_report(train=train_array,test=test_array)
             
