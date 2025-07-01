@@ -13,6 +13,8 @@ logging
 pickle
 from_root   # make dir in root of project
 pymongo   # mongodb
+dill
+pyyaml
 
 
 setuptools

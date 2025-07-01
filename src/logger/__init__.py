@@ -26,9 +26,11 @@ def configure_logger(name):
     consol_handler.setFormatter(formatter)
     consol_handler.setLevel(logging.DEBUG)
 
-    logger.addHandler(file_handler)
-    logger.addHandler(consol_handler)
+    if not logger.handlers:
+        logger.addHandler(file_handler)
+        logger.addHandler(consol_handler)
 
     return logger
 
 
+# So, when you import logging from that module, you’re getting the standard logging module that your module re-exposes.
