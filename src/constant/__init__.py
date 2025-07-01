@@ -10,7 +10,7 @@ MONGODB_URL_KEY = "MONGODB_URL"
 MONGODB_URL = os.getenv("MONGODB_URL_KEY")
 
 
-
+#s
 PIPELINE_NAME: str = ""
 ARTIFACT_DIR: str = "artifact"
 

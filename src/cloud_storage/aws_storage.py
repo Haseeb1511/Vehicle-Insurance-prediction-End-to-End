@@ -8,7 +8,7 @@ import pickle
 from botocore.exceptions import ClientError
 
 from src.logger import configure_logger
-logging = configure_logger("aws_configure")
+logger = configure_logger("src/cloud_storage/aws_storage")
 from src.exception import MyException
 
 
@@ -78,7 +78,7 @@ class SimpleStorageService:
             if e.response["Error"]["Code"] == "404":
                 folder_obj = folder_name + "/"
                 self.s3_client.put_object(Bucket=bucket_name, Key=folder_obj)
-            logging.info("Exited the create_folder method of SimpleStorageService class")
+            logger.info("Exited the create_folder method of SimpleStorageService class")
     
 
     def upload_file(self, from_filename: str, to_filename: str, bucket_name: str, remove: bool = True):
@@ -88,8 +88,8 @@ class SimpleStorageService:
         #Delete the file if remove=True
         if remove:
             os.remove(from_filename)
-            logging.info(f"Removed local file {from_filename} after upload")
-        logging.info("Exited the upload_file method of SimpleStorageService class")
+            logger.info(f"Removed local file {from_filename} after upload")
+        logger.info("Exited the upload_file method of SimpleStorageService class")
 
     
     def upload_df_as_csv(self, data_frame: DataFrame, local_filename: str, bucket_filename: str, bucket_name: str) -> None:

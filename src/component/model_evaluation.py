@@ -3,7 +3,7 @@ from src.entity.artificat_entity import DataIngestionArtifact,ModelTrainerArtifa
 from sklearn.metrics import f1_score
 from src.exception import MyException
 from src.logger import configure_logger
-logging = configure_logger("model_evaluation")
+logger = configure_logger("model_evaluation")
 from src.constant import TARGET_COLUMN,SCHEMA_FILE_PATH
 from src.utils.main import load_object
 import os,sys
@@ -35,13 +35,16 @@ class ModelEvaluation:
 
 
     def get_best_model(self):
-        bucket_name = self.model_eval_config.bucket_name
-        model_path =self.model_eval_config.s3_model_key_path
-        vehicleinsurance_estimator = VehicleInsuranceEstimator(bucket_name,model_path)
+        try:
+            bucket_name = self.model_eval_config.bucket_name
+            model_path =self.model_eval_config.s3_model_key_path
+            vehicleinsurance_estimator = VehicleInsuranceEstimator(bucket_name,model_path)
 
-        if vehicleinsurance_estimator.is_model_present(model_path=model_path):
-            return vehicleinsurance_estimator
-        return None
+            if vehicleinsurance_estimator.is_model_present(model_path=model_path):
+                return vehicleinsurance_estimator
+            return None
+        except Exception as e:
+            raise MyException(e,sys) from e
     
     # Preprocessing 
     def get_data_transformer_obj(self):
@@ -73,7 +76,7 @@ class ModelEvaluation:
     
     def _rename_columns(self, df):
         """Rename specific columns and ensure integer types for dummy columns."""
-        logging.info("Renaming specific columns and casting to int")
+        logger.info("Renaming specific columns and casting to int")
         df = df.rename(columns={
             "Vehicle_Age_< 1 Year": "Vehicle_Age_lt_1_Year",
             "Vehicle_Age_> 2 Years": "Vehicle_Age_gt_2_Years"
@@ -85,7 +88,7 @@ class ModelEvaluation:
     
     def _drop_id_column(self, df):
         """Drop the 'id' column if it exists."""
-        logging.info("Dropping 'id' column")
+        logger.info("Dropping 'id' column")
         if "_id" in df.columns:
             df = df.drop("_id", axis=1)
         return df
@@ -93,50 +96,56 @@ class ModelEvaluation:
     #--------------Preprocessing completed----------------------------------
 
     def evaluate_model(self)->EvaluateModelResponse:
-        test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
-        x,y = test_df.drop(TARGET_COLUMN,axis=1),test_df(TARGET_COLUMN)
+        try:
+            test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
+            x,y = test_df.drop(TARGET_COLUMN,axis=1),test_df(TARGET_COLUMN)
 
-        x = self._map_gender_column(x)
-        x = self._create_dummy_columns(x)
-        x = self._rename_columns(x)
-        x = self._drop_id_column(x)
-        preprocess = self.get_data_transformer_obj()
-        x = preprocess.fit(x)
+            x = self._map_gender_column(x)
+            x = self._create_dummy_columns(x)
+            x = self._rename_columns(x)
+            x = self._drop_id_column(x)
+            preprocess = self.get_data_transformer_obj()
+            x = preprocess.fit(x)
 
-        trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
-        trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
-        trained_model_accuracy = self.model_trainer_artifact.metric_artifact.accuracy
-        logging.info(f"Acuracy = {trained_model_accuracy} and f1_Score {trained_model_f1_score}")
+            trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
+            trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
+            trained_model_accuracy = self.model_trainer_artifact.metric_artifact.accuracy
+            logger.info(f"Acuracy = {trained_model_accuracy} and f1_Score {trained_model_f1_score}")
 
-        best_model_f1_score = None
-        best_model = self.get_best_model()
+            best_model_f1_score = None
+            best_model = self.get_best_model()
 
-        if best_model is not None:  # checking in s3 storage 
-            y_hat_best_model = best_model.predict(x)
-            best_model_f1_score =f1_score(y_hat_best_model,y)
+            if best_model is not None:  # checking in s3 storage 
+                y_hat_best_model = best_model.predict(x)
+                best_model_f1_score =f1_score(y_hat_best_model,y)
 
-        temp_model_best_score_f1 = 0 if best_model_f1_score is None else best_model_f1_score
+            temp_model_best_score_f1 = 0 if best_model_f1_score is None else best_model_f1_score
 
-        result = EvaluateModelResponse(
-            trained_model_f1_score=trained_model_f1_score,
-            best_model_f1_score=best_model_f1_score,
-            is_model_accepted=trained_model_f1_score > temp_model_best_score_f1,
-            difference=trained_model_f1_score- temp_model_best_score_f1
-        )
+            result = EvaluateModelResponse(
+                trained_model_f1_score=trained_model_f1_score,
+                best_model_f1_score=best_model_f1_score,
+                is_model_accepted=trained_model_f1_score > temp_model_best_score_f1,
+                difference=trained_model_f1_score- temp_model_best_score_f1
+            )
 
-        return result 
+            return result
+        except Exception as e:
+            raise MyException(e,sys) from e 
+    
     
     def initiate_model_evaluation(self) -> ModelEvaluationArtifact:
+        try:
+            evaluat_model = self.evaluate_model()
+            s3_model_path = self.model_eval_config.s3_model_key_path
 
-        evaluat_model = self.evaluate_model()
-        s3_model_path = self.model_eval_config.s3_model_key_path
-
-        model_evaluation_artifact = ModelEvaluationArtifact(
-            is_model_accepted=evaluat_model.is_model_accepted,
-            changed_accuracy=evaluat_model.difference,
-            s3_model_path=s3_model_path,
-            trained_model_path=self.model_trainer_artifact.trained_model_file_path
-        )
-        return model_evaluation_artifact
+            model_evaluation_artifact = ModelEvaluationArtifact(
+                is_model_accepted=evaluat_model.is_model_accepted,
+                changed_accuracy=evaluat_model.difference,
+                s3_model_path=s3_model_path,
+                trained_model_path=self.model_trainer_artifact.trained_model_file_path
+            )
+            return model_evaluation_artifact
+        except Exception as e:
+            raise MyException(e,sys) from e
 
 
