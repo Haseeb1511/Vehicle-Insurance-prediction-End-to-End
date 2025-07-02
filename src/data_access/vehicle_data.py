@@ -34,7 +34,7 @@ class VehicleData():
             # Convert collection data to DataFrame and preprocess
             print("Fetching data from mongoDB")
 
-            df = pd.DataFrame(list(collection.find().limit(2000)))    ## This returns a list of documents (dicts)
+            df = pd.DataFrame(list(collection.find().limit(5000)))    ## This returns a list of documents (dicts)
 
             print(f"Data fecthed with len: {len(df)}")
             logger.info(f"Data fetched from Mongodb with len: {len(df)}")

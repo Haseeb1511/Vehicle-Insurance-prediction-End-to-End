@@ -23,6 +23,7 @@ class ModelTrainer:
     def get_model_obj_and_report(self,train:np.ndarray,test:np.ndarray):
         try:
             x_train,y_train,x_test,y_test = train[:,:-1],train[:,-1],test[:,:-1],test[:,-1]
+            
             model = RandomForestClassifier(n_estimators=self.model_trainer_config._n_estimators,
                                         max_depth=self.model_trainer_config._max_depth,
                                         min_samples_leaf=self.model_trainer_config._min_samples_leaf,
@@ -30,6 +31,8 @@ class ModelTrainer:
                                         criterion=self.model_trainer_config._criterion,
                                         random_state=self.model_trainer_config._random_state
                                         )
+            logger.info(f"Model selected is {model}")
+            logger.info("model training started ......")
             model.fit(x_train,y_train)
 
             y_pred = model.predict(x_test)
@@ -37,10 +40,10 @@ class ModelTrainer:
             percision  = precision_score(y_test,y_pred)
             f1score = f1_score(y_test,y_pred)
             recall = recall_score(y_test,y_pred)
-
+            logger.info(f"Model training finished with accuracy of : {accuracy}")
             metric_artifact = ClassificationMetricArtifact(
-                f1_score=f1_score,
-                precision_score=precision_score,
+                f1_score=f1score,
+                precision_score=percision,
                 recall_score=recall,
                 accuracy=accuracy
             )

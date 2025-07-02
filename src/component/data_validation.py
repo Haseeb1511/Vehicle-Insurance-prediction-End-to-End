@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os,sys,json
 from src.logger import configure_logger
-logger = configure_logger("data_validation")
+logger = configure_logger("DataValidation")
 from src.exception import MyException
 from src.entity.artificat_entity import DataValidationArtifact,DataIngestionArtifact
 from src.entity.config_entity import DataValidationConfig
@@ -23,8 +23,10 @@ class DataValidation:
         return status
     
     def is_column_exist(self,dataframe:pd.DataFrame):
+        logger.info("Checking if any column is missing....")
         try:
             dataframe_column = dataframe.columns
+            logger.info(f"Columns in DataFrame are: {dataframe_column}")
             missing_numerical_column = []
             missing_categorical_column = []
 
@@ -54,6 +56,7 @@ class DataValidation:
 
     def initiate_data_validation(self):
         try:
+            logger.info("Starting initiate data validation  ")
             validation_error_msg = ""
             train_df,test_df  = (DataValidation.read_data(self.data_ingestion_artificat.trained_file_path),DataValidation.read_data(self.data_ingestion_artificat.test_file_path))
 

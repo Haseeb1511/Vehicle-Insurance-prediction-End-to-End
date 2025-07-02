@@ -19,11 +19,12 @@ class ModelPusher:
 
     def initiate_model_pusher(self):
         try:
+            logger.info("Model Pushing to s3 started.......")
             self.vehicle_insurance_estimator.save_model(from_file=self.model_eval_artifact.trained_model_path)
             model_pusher_artifact = ModelPusherArtifact(bucket_name=self.model_pusher_config.bucket_name,
                                                         s3_model_path=self.model_pusher_config.s3_model_key_path
             )
-            logger.info("Uploaded artifacts folder to s3 bucket")
+            # logger.info(f"Successfully Uploaded the artifacts folder to s3 bucket : {self.model_pusher_config.bucket_name} with name {self.model_pusher_config.s3_model_key_path}")
             logger.info(f"Model pusher artifact: [{model_pusher_artifact}]")
             logger.info("Exited initiate_model_pusher method of ModelTrainer class")
             return model_pusher_artifact

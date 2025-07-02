@@ -33,18 +33,20 @@ class ModelEvaluation:
         self.model_trainer_artifact = model_trainer_artifact
         self._schema_config = read_yaml_file(file_path=SCHEMA_FILE_PATH)
 
-
     def get_best_model(self):
         try:
             bucket_name = self.model_eval_config.bucket_name
-            model_path =self.model_eval_config.s3_model_key_path
-            vehicleinsurance_estimator = VehicleInsuranceEstimator(bucket_name,model_path)
+            model_path=self.model_eval_config.s3_model_key_path
+            estimator = VehicleInsuranceEstimator(bucket_name=bucket_name,
+                                               model_path=model_path)
 
-            if vehicleinsurance_estimator.is_model_present(model_path=model_path):
-                return vehicleinsurance_estimator
+            if estimator.is_model_present(model_path=model_path):
+                return estimator
             return None
+
         except Exception as e:
-            raise MyException(e,sys) from e
+            raise  MyException(e,sys)
+
     
     # Preprocessing 
     def get_data_transformer_obj(self):
@@ -54,10 +56,10 @@ class ModelEvaluation:
         num_feature = self._schema_config["numerical_columns"]
         mm_column = self._schema_config["mm_columns"]
 
-        preprocess = ColumnTransformer(transformers=[(
+        preprocess = ColumnTransformer(transformers=[
             ("Standard Scaled",sc,num_feature),
             ("MinMax Scaler",min_max_scaler,mm_column)
-        )],remainder="passthrough")
+        ],remainder="passthrough")
 
         final_pipeline = Pipeline(steps=[
             ("preprocess",preprocess)
@@ -98,14 +100,15 @@ class ModelEvaluation:
     def evaluate_model(self)->EvaluateModelResponse:
         try:
             test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
-            x,y = test_df.drop(TARGET_COLUMN,axis=1),test_df(TARGET_COLUMN)
+            x = test_df.drop(TARGET_COLUMN,axis=1)
+            y = test_df[TARGET_COLUMN]
 
             x = self._map_gender_column(x)
             x = self._create_dummy_columns(x)
-            x = self._rename_columns(x)
             x = self._drop_id_column(x)
+            x = self._rename_columns(x)
             preprocess = self.get_data_transformer_obj()
-            x = preprocess.fit(x)
+            x = preprocess.fit_transform(x)
 
             trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
             trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
@@ -115,9 +118,11 @@ class ModelEvaluation:
             best_model_f1_score = None
             best_model = self.get_best_model()
 
-            if best_model is not None:  # checking in s3 storage 
+            if best_model is not None:
+                logger.info(f"Computing F1_Score for production model..")
                 y_hat_best_model = best_model.predict(x)
-                best_model_f1_score =f1_score(y_hat_best_model,y)
+                best_model_f1_score = f1_score(y, y_hat_best_model)
+                logger.info(f"F1_Score-Production Model: {best_model_f1_score}, F1_Score-New Trained Model: {trained_model_f1_score}")
 
             temp_model_best_score_f1 = 0 if best_model_f1_score is None else best_model_f1_score
 
@@ -130,7 +135,7 @@ class ModelEvaluation:
 
             return result
         except Exception as e:
-            raise MyException(e,sys) from e 
+            raise MyException(e, sys) 
     
     
     def initiate_model_evaluation(self) -> ModelEvaluationArtifact:
