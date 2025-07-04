@@ -7,7 +7,7 @@ seaborn
 plotly
 imblearn
 uvicorn
-
+python-multipart
 mypy-boto3-s3
 boto3    # aws
 boto3-stubs

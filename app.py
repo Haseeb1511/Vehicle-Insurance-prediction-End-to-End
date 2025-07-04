@@ -4,12 +4,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from fastapi.templating import Jinja2Templates
-from starlette.responses import HTMLResponse,RedirectResponse
 from uvicorn import run as app_run
 import os,sys
 
 # Importing Local Modules
-from src.constant import APP_HOST,APP_PORT
 from src.pipeline.prediction_pipline import VehicleData,VehicleDataClassifier
 from src.pipeline.training_pipeline import TrainPipeline
 from src.exception import MyException
@@ -86,12 +84,12 @@ async def trainRouteClient():
         raise MyException(e,sys) from e
 
 
-
 @app.post("/")
 async def predRouteClient(request:Request):
     """This endpoint predict base on user input"""
     try:
         form = DataFrame(request)
+        await form.get_vehicle_data()
         vehicle_data = VehicleData(
                                 Gender= form.Gender,
                                 Age = form.Age,
@@ -127,14 +125,7 @@ async def predRouteClient(request:Request):
 
 # Main entry point to start the FastAPI server
 if __name__ == "__main__":
-    app_run(app, host=APP_HOST, port=APP_PORT)
-
-
-
-
-
-
-
+    app_run(app, host="0.0.0.0", port=5000)
 
 
 #Cross-Origin Resource Sharing (CORS)

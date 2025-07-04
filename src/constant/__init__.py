@@ -78,5 +78,3 @@ MODEL_BUCKET_NAME = "vehicle-insurance-haseeb1706"
 MODEL_PUSHER_S3_KEY = "model-registry"
 
 
-APP_HOST = "0.0.0.0"
-APP_PORT = 5000
