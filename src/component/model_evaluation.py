@@ -48,23 +48,6 @@ class ModelEvaluation:
             raise  MyException(e,sys)
 
     
-    # Preprocessing 
-    def get_data_transformer_obj(self):
-        sc = StandardScaler()
-        min_max_scaler = MinMaxScaler()
-
-        num_feature = self._schema_config["numerical_columns"]
-        mm_column = self._schema_config["mm_columns"]
-
-        preprocess = ColumnTransformer(transformers=[
-            ("Standard Scaled",sc,num_feature),
-            ("MinMax Scaler",min_max_scaler,mm_column)
-        ],remainder="passthrough")
-
-        final_pipeline = Pipeline(steps=[
-            ("preprocess",preprocess)
-        ])
-        return final_pipeline
     
     def _map_gender_column(self, df):
         """Map Gender column to 0 for Female and 1 for Male."""
@@ -100,17 +83,16 @@ class ModelEvaluation:
     def evaluate_model(self)->EvaluateModelResponse:
         try:
             test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
-            x = test_df.drop(TARGET_COLUMN,axis=1)
-            y = test_df[TARGET_COLUMN]
+            x = test_df.drop(TARGET_COLUMN,axis=1)  #input
+            y = test_df[TARGET_COLUMN]  #output
 
             x = self._map_gender_column(x)
-            x = self._create_dummy_columns(x)
             x = self._drop_id_column(x)
+            x = self._create_dummy_columns(x)
             x = self._rename_columns(x)
-            preprocess = self.get_data_transformer_obj()
-            x = preprocess.fit_transform(x)
 
             trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
+
             trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
             trained_model_accuracy = self.model_trainer_artifact.metric_artifact.accuracy
             logger.info(f"Acuracy = {trained_model_accuracy} and f1_Score {trained_model_f1_score}")

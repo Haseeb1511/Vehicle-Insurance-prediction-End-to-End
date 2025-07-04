@@ -37,9 +37,9 @@ class ModelTrainer:
 
             y_pred = model.predict(x_test)
             accuracy = accuracy_score(y_test,y_pred)
-            percision  = precision_score(y_test,y_pred)
-            f1score = f1_score(y_test,y_pred)
-            recall = recall_score(y_test,y_pred)
+            percision  = precision_score(y_test, y_pred, average='binary')
+            f1score = f1_score(y_test, y_pred, average='binary')
+            recall = recall_score(y_test, y_pred, average='binary')
             logger.info(f"Model training finished with accuracy of : {accuracy}")
             metric_artifact = ClassificationMetricArtifact(
                 f1_score=f1score,
@@ -62,7 +62,9 @@ class ModelTrainer:
             # Load preprocessing object
             preprocess_obj = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)  #loading the preprocessing pipline
 
-            if accuracy_score(train_array[:,-1],trained_model.predict(train_array[:,:-1]))< self.model_trainer_config.expected_accuracy:
+            # if metric_artifact.accuracy < self.model_trainer_config.expected_accuracy:
+            #     raise Exception("No model found with score above the base score")
+            if accuracy_score(train_array[:, -1], trained_model.predict(train_array[:, :-1])) < self.model_trainer_config.expected_accuracy:
                 raise Exception("No model found with score above the base score")
             
             my_model = MyModel(preprocessing_object=preprocess_obj,trained_model_object=trained_model)

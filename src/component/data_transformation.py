@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from sklearn.preprocessing import StandardScaler,MinMaxScaler,FunctionTransformer
 from sklearn.pipeline import Pipeline
 from imblearn.combine import SMOTEENN
 from src.constant import TARGET_COLUMN, SCHEMA_FILE_PATH, CURRENT_YEAR
@@ -32,23 +32,39 @@ class DataTransformation:
         return pd.read_csv(file_path)
 
 
-    def get_data_transformer_obj(self):
-        sc = StandardScaler()
-        min_max_scaler = MinMaxScaler()
+    def get_data_transformer_object(self) -> Pipeline:
 
-        num_feature = self._schema_config["numerical_columns"]
-        mm_column = self._schema_config["mm_columns"]
+        logger.info("Entered get_data_transformer_object method of DataTransformation class")
 
-        preprocess = ColumnTransformer(transformers=[
-            ("Standard Scaled",sc,num_feature),
-            ("MinMax Scaler",min_max_scaler,mm_column)
-        ],remainder="passthrough")
+        try:
+            # Initialize transformers
+            numeric_transformer = StandardScaler()
+            min_max_scaler = MinMaxScaler()
+            logger.info("Transformers Initialized: StandardScaler-MinMaxScaler")
 
-        final_pipeline = Pipeline(steps=[
-            ("preprocess",preprocess)
-        ])
+            # Load schema configurations
+            num_features = self._schema_config['num_features']
+            mm_columns = self._schema_config['mm_columns']
+            logger.info("Cols loaded from schema.")
 
-        return final_pipeline
+            # Creating preprocessor pipeline
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ("StandardScaler", numeric_transformer, num_features),
+                    ("MinMaxScaler", min_max_scaler, mm_columns)
+                ],
+                remainder='passthrough'  # Leaves other columns as they are
+            )
+
+            # Wrapping everything in a single pipeline
+            final_pipeline = Pipeline(steps=[("Preprocessor", preprocessor)])
+            logger.info("Final Pipeline Ready!!")
+            logger.info("Exited get_data_transformer_object method of DataTransformation class")
+            return final_pipeline
+
+        except Exception as e:
+            logger.exception("Exception occurred in get_data_transformer_object method of DataTransformation class")
+            raise MyException(e, sys) from e
     
     def _map_gender_column(self, df):
         """Map Gender column to 0 for Female and 1 for Male."""
@@ -115,10 +131,11 @@ class DataTransformation:
             input_feature_test_df = self._rename_columns(input_feature_test_df)
             logger.info("Custom transformations applied to test data")
 
-            preprocess = self.get_data_transformer_obj()
+            preprocess = self.get_data_transformer_object()
 
             input_feature_train_arr = preprocess.fit_transform(input_feature_train_df)
             input_feature_test_arr = preprocess.transform(input_feature_test_df)
+
             logger.info("Applying SMOTEENIN")
             smt = SMOTEENN(sampling_strategy="minority")
             input_feature_train_final, target_feature_train_final = smt.fit_resample(
@@ -140,7 +157,7 @@ class DataTransformation:
 
             return DataTransformationArtifact(
                 transformed_test_file_path=self.data_transformation_config.transformed_test_file_path,
-                transformed_train_file_path=self.data_transformation_config.transformed_test_file_path,
+                transformed_train_file_path=self.data_transformation_config.transformed_train_file_path,
                 transformed_object_file_path=self.data_transformation_config.transformed_object_file_path
             )
         except Exception as e:

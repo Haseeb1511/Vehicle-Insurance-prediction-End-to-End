@@ -27,7 +27,7 @@ class MyModel:
         self.preprocessing_object = preprocessing_object   # pipeline
         self.trained_model_object = trained_model_object   # traied model
 
-    def predict(self, dataframe: pd.DataFrame) -> DataFrame:
+    def predict(self, dataframe: DataFrame) -> DataFrame:
         """
         Function accepts preprocessed inputs (with all custom transformations already applied),
         applies scaling using preprocessing_object, and performs prediction on transformed features.
