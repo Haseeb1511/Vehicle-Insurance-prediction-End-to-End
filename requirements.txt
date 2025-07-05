@@ -9,18 +9,17 @@ imblearn
 uvicorn
 python-multipart
 mypy-boto3-s3
-boto3    # aws
+boto3    
 boto3-stubs
 
 ipykernel
 logging 
-pickle
-from_root   # make dir in root of project
-pymongo   # mongodb
+from_root   
+pymongo   
 dill
 pyyaml
 
 
 
 setuptools
--e .  #  This installs your project in "editable mode", meaning any changes you make in your code are reflected immediately without needing to reinstall
+-e .  
