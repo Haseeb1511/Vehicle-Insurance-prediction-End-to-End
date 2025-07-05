@@ -13,13 +13,9 @@ boto3
 boto3-stubs
 
 ipykernel
-logging 
-from_root   
 pymongo   
 dill
 pyyaml
 
-
-
 setuptools
--e .  
+-e .
