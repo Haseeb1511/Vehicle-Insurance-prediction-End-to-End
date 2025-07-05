@@ -45,9 +45,14 @@ This info comes from `setup.py` or `pyproject.toml`.
 
 
 
+## ✅ Running on AWS EC2
 
-port :5000
-us east-1  aws server
+```markdown
+- **Port:** `5000`
+- **Region:** `us-east-1`
+```
 
 
-m
+## working project on AWS EC2
+
+![image](./images/Screenshot%20(74).png)

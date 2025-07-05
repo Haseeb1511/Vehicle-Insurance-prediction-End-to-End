@@ -200,3 +200,4 @@ cython_debug/
 
 artifact
 logs
+mongodb atlas.txt
