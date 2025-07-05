@@ -41,3 +41,13 @@ This info comes from `setup.py` or `pyproject.toml`.
 | Not using `-e .`           | ❌ No, not needed |
 
 ---
+
+
+
+
+
+port :5000
+us east-1  aws server
+
+
+d
