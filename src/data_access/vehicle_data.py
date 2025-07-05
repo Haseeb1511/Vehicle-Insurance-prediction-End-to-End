@@ -11,7 +11,6 @@ from src.exception import MyException
 from src.logger import configure_logger
 logger = configure_logger("mongo_to_pd")
 
-
 class VehicleData():
     """
     A class to export MongoDB records as a pandas DataFrame.
