@@ -56,3 +56,23 @@ This info comes from `setup.py` or `pyproject.toml`.
 ## working project on AWS EC2
 
 ![image](./images/Screenshot%20(74).png)
+
+
+
+## ✅ Option 1: Temporarily disable the workflow to stop CI/CD
+```markdown
+Best for: Keep your workflow file, but skip running it for now.
+
+1️⃣ Go to your repository on GitHub
+
+Example: https://github.com/your-username/your-repo
+
+2️⃣ Click the Actions tab at the top (next to Code, Issues, Pull requests).
+
+3️⃣ Find your workflow in the list (e.g., CI, Deploy to EC2, Docker Build, etc.).
+
+4️⃣ Open the workflow details page — you’ll see runs, logs, and settings.
+
+5️⃣ On the top right of the workflow page, you’ll see a ... menu or “Manage workflow” button.
+
+```
