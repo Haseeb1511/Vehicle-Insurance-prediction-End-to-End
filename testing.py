@@ -14,3 +14,6 @@ from src.pipeline.training_pipeline import TrainPipeline
 
 p = TrainPipeline()
 p.run_pipeline()
+
+
+#dd
