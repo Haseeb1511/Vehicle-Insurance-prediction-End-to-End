@@ -1,5 +1,4 @@
 fastapi
-streamlit
 scikit-learn
 pandas
 matplotlib
@@ -20,6 +19,6 @@ ipykernel
 pymongo   
 dill
 pyyaml
-
+dotenv
 setuptools
 -e .

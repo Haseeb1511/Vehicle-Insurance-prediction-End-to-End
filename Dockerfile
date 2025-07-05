@@ -13,7 +13,10 @@ ENV PYTHONUNBUFFERED=1
 COPY . .
 
 # Install dependencies and upgrade the pip
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --default-timeout=100 --retries=10  -r requirements.txt
+
+
 
 # Expose port 5000 for Flask app
 EXPOSE 5000
